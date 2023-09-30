@@ -45,15 +45,15 @@ router.post('/addcalorieintake', authTokenHandler, async (req, res) => {
 
     var query = item;
     request.get({
-      url: 'https://api.api-ninjas.com/v1/nutrition?query=' + query,
-      headers: {
-        'X-Api-Key': process.env.NUTRITION_API_KEY,
-      },
-    }, async function(error, response, body) {
-      if(error) return console.error('Request failed:', error);
-      else if(response.statusCode != 200) return console.error('Error:', response.statusCode, body.toString('utf8'));
-      else {
-         // body :[ {
+        url: 'https://api.api-ninjas.com/v1/nutrition?query=' + query,
+        headers: {
+            'X-Api-Key': process.env.NUTRITION_API_KEY,
+        },
+    }, async function (error, response, body) {
+        if (error) return console.error('Request failed:', error);
+        else if (response.statusCode != 200) return console.error('Error:', response.statusCode, body.toString('utf8'));
+        else {
+            // body :[ {
             //     "name": "rice",
             //     "calories": 127.4,
             //     "serving_size_g": 100,
@@ -82,7 +82,7 @@ router.post('/addcalorieintake', authTokenHandler, async (req, res) => {
 
             await user.save();
             res.json(createResponse(true, 'Calorie intake added successfully'));
-      }
+        }
     });
 
 })
@@ -100,8 +100,6 @@ router.post('/getcalorieintakebydate', authTokenHandler, async (req, res) => {
     res.json(createResponse(true, 'Calorie intake for the date', user.calorieIntake));
 
 })
-
-// has a bug
 router.post('/getcalorieintakebylimit', authTokenHandler, async (req, res) => {
     const { limit } = req.body;
     const userId = req.userId;
@@ -110,13 +108,22 @@ router.post('/getcalorieintakebylimit', authTokenHandler, async (req, res) => {
         return res.status(400).json(createResponse(false, 'Please provide limit'));
     } else if (limit === 'all') {
         return res.json(createResponse(true, 'Calorie intake', user.calorieIntake));
-    } 
+    }
     else {
+
+
         let date = new Date();
-        date.setDate(date.getDate() - parseInt(limit));
-        user.calorieIntake = filterEntriesByDate(user.calorieIntake, date);
+        let currentDate = new Date(date.setDate(date.getDate() - parseInt(limit))).getTime();
+        // 1678910
+
+        user.calorieIntake = user.calorieIntake.filter((item) => {
+            return new Date(item.date).getTime() >= currentDate;
+        })
+
 
         return res.json(createResponse(true, `Calorie intake for the last ${limit} days`, user.calorieIntake));
+
+
     }
 })
 router.delete('/deletecalorieintake', authTokenHandler, async (req, res) => {
@@ -152,7 +159,7 @@ router.get('/getgoalcalorieintake', authTokenHandler, async (req, res) => {
         BMR = 447.593 + (9.247 * weightInKg) + (3.098 * heightInCm) - (4.330 * age)
 
     }
-    else{
+    else {
         BMR = 447.593 + (9.247 * weightInKg) + (3.098 * heightInCm) - (4.330 * age)
     }
     if (user.goal == 'weightLoss') {
@@ -165,7 +172,7 @@ router.get('/getgoalcalorieintake', authTokenHandler, async (req, res) => {
         maxCalorieIntake = BMR;
     }
 
-    res.json(createResponse(true, 'max calorie intake', {maxCalorieIntake}));
+    res.json(createResponse(true, 'max calorie intake', { maxCalorieIntake }));
 
 })
 

@@ -64,8 +64,11 @@ router.post('/getworkoutsbylimit', authTokenHandler, async (req, res) => {
         return res.json(createResponse(true, 'All workout entries', user.workouts));
     } else {
         let date = new Date();
-        date.setDate(date.getDate() - parseInt(limit));
-        user.workouts = filterEntriesByDate(user.workouts, date);
+        let currentDate = new Date(date.setDate(date.getDate() - parseInt(limit))).getTime();
+
+        user.workouts = user.workouts.filter((item) => {
+            return new Date(item.date).getTime() >= currentDate;
+        })
 
         return res.json(createResponse(true, `Workout entries for the last ${limit} days`, user.workouts));
     }
@@ -89,9 +92,24 @@ router.delete('/deleteworkoutentry', authTokenHandler, async (req, res) => {
 
 
 // has a bug
-router.get('/getuserworkouts', authTokenHandler, async (req, res) => {
+router.get('/getusergoalworkout', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
+
+    if(user.goal == "weightLoss"){
+        let goal = 7;
+        res.json(createResponse(true, 'User goal workout days', { goal }));
+    }
+    else if(user.goal == "weightGain"){
+
+        let goal = 4;
+        res.json(createResponse(true, 'User goal workout days', { goal }));
+    }
+    else{
+   
+        let goal = 5;
+        res.json(createResponse(true, 'User goal workout days', { goal }));
+    }
 
     res.json(createResponse(true, 'User workout history', { workouts: user.workouts }));
 });

@@ -15,7 +15,7 @@ function createResponse(ok, message, data) {
 }
 
 
-app.post('/workouts', adminTokenHandler , async (req, res) => {
+router.post('/workouts', adminTokenHandler , async (req, res) => {
     try {
         // name: {
         //     type: String,
@@ -75,7 +75,7 @@ app.post('/workouts', adminTokenHandler , async (req, res) => {
     }
 });
 
-app.get('/workouts', async (req, res) => {
+router.get('/workouts', async (req, res) => {
     try {
         const workouts = await Workout.find({});
         res.json(createResponse(true, 'Workouts fetched successfully', workouts));
@@ -84,7 +84,7 @@ app.get('/workouts', async (req, res) => {
     }
 });
 
-app.get('/workouts/:id', async (req, res) => {
+router.get('/workouts/:id', async (req, res) => {
     try {
         const workout = await Workout.findById(req.params.id);
         res.json(createResponse(true, 'Workout fetched successfully', workout));
@@ -94,7 +94,7 @@ app.get('/workouts/:id', async (req, res) => {
 });
 
 
-app.put('/workouts/:id', adminTokenHandler , async (req, res) => {
+router.put('/workouts/:id', adminTokenHandler , async (req, res) => {
     try {
         const workout = await Workout.findById(req.params.id);
         const { name, description, durationInMinutes, exercises, imageURL } = req.body;
@@ -110,7 +110,7 @@ app.put('/workouts/:id', adminTokenHandler , async (req, res) => {
     }
 });
 
-app.delete('/workouts/:id', adminTokenHandler , async (req, res) => {
+router.delete('/workouts/:id', adminTokenHandler , async (req, res) => {
     try {
         const workout = await Workout.findById(req.params.id);
         await workout.remove();

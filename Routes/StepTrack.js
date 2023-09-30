@@ -50,7 +50,7 @@ router.post('/getstepsbydate', authTokenHandler, async (req, res) => {
 });
 
 
-// has a bug
+
 router.post('/getstepsbylimit', authTokenHandler, async (req, res) => {
     const { limit } = req.body;
 
@@ -63,8 +63,13 @@ router.post('/getstepsbylimit', authTokenHandler, async (req, res) => {
         return res.json(createResponse(true, 'All steps entries', user.steps));
     } else {
         let date = new Date();
-        date.setDate(date.getDate() - parseInt(limit));
-        user.steps = filterEntriesByDate(user.steps, date);
+        let currentDate = new Date(date.setDate(date.getDate() - parseInt(limit))).getTime();
+
+
+
+        user.steps = user.steps.filter((item) => {
+            return new Date(item.date).getTime() >= currentDate;
+        })
 
         return res.json(createResponse(true, `Steps entries for the last ${limit} days`, user.steps));
     }
@@ -87,12 +92,22 @@ router.delete('/deletestepentry', authTokenHandler, async (req, res) => {
 });
 
 
-// has a bug
-router.get('/getusersteps', authTokenHandler, async (req, res) => {
+
+router.get('/getusergoalsteps', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
 
-    const totalSteps = user.steps.reduce((total, entry) => total + entry.steps, 0);
+    let totalSteps = 0;
+
+    if(user.goal == "weightLoss"){
+        totalSteps = 10000;
+    }
+    else if(user.goal == "weightGain"){
+        totalSteps = 5000;
+    }
+    else{
+        totalSteps = 7500;
+    }   
 
     res.json(createResponse(true, 'User steps information', { totalSteps }));
 });

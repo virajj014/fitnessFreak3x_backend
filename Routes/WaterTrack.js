@@ -65,8 +65,12 @@ router.post('/getwaterbylimit', authTokenHandler, async (req, res) => {
         return res.json(createResponse(true, 'All water entries', user.water));
     } else {
         let date = new Date();
-        date.setDate(date.getDate() - parseInt(limit));
-        user.water = filterEntriesByDate(user.water, date);
+        let currentDate = new Date(date.setDate(date.getDate() - parseInt(limit))).getTime();
+
+       
+        user.water = user.water.filter((item) => {
+            return new Date(item.date).getTime() >= currentDate;
+        });
 
         return res.json(createResponse(true, `Water entries for the last ${limit} days`, user.water));
     }
@@ -82,15 +86,13 @@ router.delete('/deletewaterentry', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
 
-    user.water = user.water.filter(entry => {
-        return entry.date !== date;
-    });
+    user.water = user.water.filter(entry => entry.date !== date);
 
     await user.save();
     res.json(createResponse(true, 'Water entry deleted successfully'));
 });
 
-router.get('/getuserwater', authTokenHandler, async (req, res) => {
+router.get('/getusergoalwater', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
 

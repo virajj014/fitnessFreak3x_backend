@@ -63,8 +63,12 @@ router.post('/getweightbylimit', authTokenHandler, async (req, res) => {
         return res.json(createResponse(true, 'All weight entries', user.weight));
     } else {
         let date = new Date();
-        date.setDate(date.getDate() - parseInt(limit));
-        user.weight = filterEntriesByDate(user.weight, date);
+        let currentDate = new Date(date.setDate(date.getDate() - parseInt(limit))).getTime();
+
+ 
+        user.weight = user.weight.filter((item) => {
+            return new Date(item.date).getTime() >= currentDate;
+        })
 
         return res.json(createResponse(true, `Weight entries for the last ${limit} days`, user.weight));
     }
@@ -88,14 +92,14 @@ router.delete('/deleteweightentry', authTokenHandler, async (req, res) => {
 
 
 // has a bug
-router.get('/getuserweight', authTokenHandler, async (req, res) => {
+router.get('/getusergoalweight', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
 
     const currentWeight = user.weight.length > 0 ? user.weight[user.weight.length - 1].weight : null;
     const goalWeight = 22 * ((user.height[user.height.length - 1].height / 100) ** 2);
 
-    res.json(createResponse(true, 'User weight information', { currentWeight, goalWeight }));
+    res.json(createResponse(true, 'User goal weight information', { currentWeight, goalWeight }));
 });
 
 router.use(errorHandler);

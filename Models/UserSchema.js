@@ -127,6 +127,18 @@ const userSchema = new mongoose.Schema({
             },
         },
     ],
+    water: [
+        {
+            date: {
+                type: Date,
+                required: true,
+            },
+            amountInMilliliters: {
+                type: Number,
+                required: true,
+            },
+        },
+    ],
 }, { timestamps: true });
 
 

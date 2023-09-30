@@ -16,6 +16,7 @@ const weightTrackRoutes = require('./Routes/WeightTrack');
 const waterTrackRoutes = require('./Routes/WaterTrack');
 const workoutTrackRoutes = require('./Routes/WorkoutTrack');
 const workoutRoutes = require('./Routes/WorkoutPlans');
+const reportRoutes = require('./Routes/Report');
 
 
 require('dotenv').config();
@@ -49,6 +50,7 @@ app.use('/weighttrack', weightTrackRoutes);
 app.use('/watertrack', waterTrackRoutes);
 app.use('/workouttrack', workoutTrackRoutes);
 app.use('/workoutplans', workoutRoutes);
+app.use('/report', reportRoutes);
 
 
 app.get('/', (req, res) => {

@@ -31,6 +31,7 @@ function createResponse(ok, message, data) {
 }
 
 router.post('/register', async (req, res, next) => {
+    console.log(req.body);
     try {
         const { name, email, password, weightInKg, heightInCm, gender, dob, goal, activityLevel } = req.body;
         const existingUser = await User.findOne({ email: email });
@@ -62,6 +63,7 @@ router.post('/register', async (req, res, next) => {
             activityLevel
         });
         await newUser.save(); // Await the save operation
+
         res.status(201).json(createResponse(true, 'User registered successfully'));
 
     }
@@ -101,10 +103,10 @@ router.post('/sendotp', async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000);
 
         const mailOptions = {
-            from : 'virajj014@gmail.com',
-            to : email,
-            subject : 'OTP for verification',
-            text : `Your OTP is ${otp}`
+            from: 'virajj014@gmail.com',
+            to: email,
+            subject: 'OTP for verification',
+            text: `Your OTP is ${otp}`
         }
 
         transporter.sendMail(mailOptions, async (err, info) => {
